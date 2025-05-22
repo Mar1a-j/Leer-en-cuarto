@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aventura de Lectura para Cuarto Básico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Fuente Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilos para el scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .text-content p {
+            margin-bottom: 1rem; /* Espacio entre párrafos */
+        }
+        .text-content ul, .text-content ol {
+            margin-left: 1.5rem;
+            list-style-type: disc;
+            margin-bottom: 1rem;
+        }
+        .text-content ol {
+            list-style-type: decimal;
+        }
+        .text-content h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 to-teal-50 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl p-8 max-w-4xl w-full border-4 border-green-300">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-green-700 mb-6 text-center leading-tight">
+            ¡Aventura de Lectura para Cuarto Básico! 🧠
+        </h1>
+        <p class="text-lg text-gray-700 mb-8 text-center">
+            Explora diferentes tipos de textos, pon a prueba tu comprensión y avanza en tu camino lector. ¡Adelante!
+        </p>
+
+        <div class="bg-teal-100 p-4 rounded-lg shadow-md mb-8 border-2 border-teal-300">
+            <h2 class="text-2xl font-bold text-teal-800 mb-4 text-center">Selecciona tu Desafío:</h2>
+            <div id="text-selector-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                </div>
+        </div>
+
+        <div id="lesson-content" class="hidden">
+            <div class="bg-green-100 p-6 rounded-lg shadow-md mb-8 border-2 border-green-300">
+                <h2 id="story-title" class="text-3xl font-bold text-green-800 mb-4 text-center"></h2>
+                <div id="story-text" class="text-content text-lg leading-relaxed text-gray-800"></div>
+            </div>
+
+            <div class="bg-yellow-100 p-6 rounded-lg shadow-md mb-8 border-2 border-yellow-300">
+                <h2 class="text-3xl font-bold text-yellow-800 mb-4 text-center">Preguntas de Comprensión</h2>
+                <div id="questions-container" class="space-y-6">
+                    </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+                <button id="check-answers-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transform hover:scale-105 transition duration-300 ease-in-out text-xl">
+                    Verificar Respuestas
+                </button>
+                <button id="reset-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-full shadow-lg transform hover:scale-105 transition duration-300 ease-in-out text-xl">
+                    Reiniciar
+                </button>
+                <button id="next-text-btn" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transform hover:scale-105 transition duration-300 ease-in-out text-xl hidden">
+                    Siguiente Desafío ▶️
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATOS DE LOS TEXTOS Y PREGUNTAS ---
+        const readingContent = [
+            {
+                id: 'roble-sabio',
+                order: 1,
+                type: 'Cuento',
+                title: 'El Secreto del Viejo Roble',
+                text: `
+                    <p>En el corazón del Bosque Susurrante, vivía un roble centenario cuyas ramas se extendían como brazos gigantes hacia el cielo. Los animales del bosque lo llamaban "El Sabio", pues se decía que guardaba un secreto ancestral. Un día, una pequeña ardilla, de nombre Nuez, se atrevió a preguntarle: "¿Qué secreto guardas, viejo roble?"</p>
+                    <p>El roble, con voz grave y hojas que crujían suavemente, respondió: "Mi secreto no es algo que se pueda ver, Nuez. Es la paciencia. He visto pasar inviernos y veranos, sequías y lluvias. He visto crecer y caer a muchas generaciones. Aprendí que la prisa es enemiga de la sabiduría. Solo con tiempo y observación se revelan los misterios más grandes."</p>
+                    <p>Nuez, aunque pequeña, comprendió la profundidad de las palabras del roble. Desde ese día, la ardilla no solo recolectaba nueces, sino que también se sentaba a observar el bosque con calma, aprendiendo de cada pequeño detalle, tal como le había enseñado el sabio roble.</p>
+                `,
+                // imageUrl: 'https://placehold.co/600x300/A0E0FF/000000?text=Roble+Sabio', // Imagen eliminada
+                questions: [
+                    { id: 'q1_1', question: '1. ¿Cuál es la principal cualidad que el viejo roble le enseña a la ardilla Nuez?', options: ['a) La fuerza.', 'b) La velocidad.', 'c) La paciencia.', 'd) La astucia.'], answer: 'c) La paciencia.' },
+                    { id: 'q1_2', question: '2. ¿Qué significa la expresión "la prisa es enemiga de la sabiduría" en el contexto del texto?', options: ['a) Que hay que correr para ser inteligente.', 'b) Que la sabiduría se consigue rápido.', 'c) Que para aprender bien, no hay que apurarse.', 'd) Que los sabios son lentos.'], answer: 'c) Que para aprender bien, no hay que apurarse.' },
+                    { id: 'q1_3', question: '3. ¿Cómo cambió la actitud de Nuez después de hablar con el roble?', options: ['a) Dejó de recolectar nueces.', 'b) Se volvió más impaciente.', 'c) Empezó a observar el bosque con calma.', 'd) Se fue a otro bosque.'], answer: 'c) Empezó a observar el bosque con calma.' },
+                    { id: 'q1_4', question: '4. ¿Qué tipo de texto es "El Secreto del Viejo Roble"?', options: ['a) Una fábula.', 'b) Un poema.', 'c) Un cuento.', 'd) Una receta.'], answer: 'c) Un cuento.' },
+                ]
+            },
+            {
+                id: 'leyenda-copihue',
+                order: 2,
+                type: 'Leyenda',
+                title: 'La Leyenda del Copihue',
+                text: `
+                    <p>En los bosques del sur de Chile, donde los araucanos vivían en armonía con la naturaleza, nació una hermosa flor roja: el copihue. La leyenda cuenta que hace mucho tiempo, dos tribus, la de los Pehuenches y la de los Lafkenches, estaban en guerra. El amor prohibido floreció entre Hueso, un joven Pehuenche, y Maqui, una doncella Lafkenche. Se encontraban en secreto junto a un lago.</p>
+                    <p>Un día, sus padres los descubrieron. Furiosos por la traición, los guerreros de ambas tribus los atacaron con flechas. Los jóvenes cayeron abrazados al agua del lago. La tristeza invadió el bosque y la naturaleza lloró su amor. Al amanecer, en el lugar donde cayeron, brotaron dos plantas que se entrelazaron. De ellas nacieron flores rojas como la sangre de los jóvenes y blancas como la pureza de su amor.</p>
+                    <p>Así nació el copihue, la flor nacional de Chile, que nos recuerda el amor y la paz que deben reinar entre los pueblos, y la belleza que puede surgir incluso de la tristeza más profunda.</p>
+                `,
+                // imageUrl: 'https://placehold.co/600x300/C1DDC1/000000?text=Leyenda+Copihue', // Imagen eliminada
+                questions: [
+                    { id: 'q2_1', question: '1. ¿Cuál es el origen del copihue, según esta leyenda?', options: ['a) Fue plantado por los dioses.', 'b) Nació del amor prohibido de dos jóvenes.', 'c) Creció de la tierra mágica.', 'd) Fue traído por los colonizadores.'], answer: 'b) Nació del amor prohibido de dos jóvenes.' },
+                    { id: 'q2_2', question: '2. ¿Qué simbolizan los colores rojo y blanco del copihue en la leyenda?', options: ['a) El sol y la luna.', 'b) La sangre de los jóvenes y la pureza de su amor.', 'c) El día y la noche.', 'd) La guerra y la paz.'], answer: 'b) La sangre de los jóvenes y la pureza de su amor.' },
+                    { id: 'q2_3', question: '3. ¿Qué mensaje principal nos deja la leyenda del copihue?', options: ['a) La importancia de la guerra entre tribus.', 'b) La belleza de los bosques chilenos.', 'c) El valor del amor y la paz entre los pueblos.', 'd) Cómo se cultivan las flores.'], answer: 'c) El valor del amor y la paz entre los pueblos.' },
+                    { id: 'q2_4', question: '4. ¿Qué tipo de texto es "La Leyenda del Copihue"?', options: ['a) Un texto instructivo.', 'b) Una noticia.', 'c) Una leyenda.', 'd) Una biografía.'], answer: 'c) Una leyenda.' },
+                ]
+            },
+            {
+                id: 'ciclo-agua',
+                order: 3,
+                type: 'Artículo Informativo',
+                title: 'El Ciclo del Agua',
+                text: `
+                    <p>El agua de nuestro planeta está siempre en movimiento, cambiando de estado y viajando por la Tierra. Este proceso se llama el ciclo del agua y es fundamental para la vida.</p>
+                    <h3>Evaporación:</h3>
+                    <p>El calor del sol calienta el agua de los océanos, ríos y lagos, convirtiéndola en vapor. Este vapor sube a la atmósfera.</p>
+                    <h3>Condensación:</h3>
+                    <p>En la atmósfera, el vapor de agua se enfría y se transforma en pequeñas gotas, formando las nubes.</p>
+                    <h3>Precipitación:</h3>
+                    <p>Cuando las nubes se llenan de estas gotas, el agua cae a la Tierra en forma de lluvia, nieve o granizo.</p>
+                    <h3>Recolección:</h3>
+                    <p>El agua que cae se acumula en océanos, ríos, lagos y también se filtra en la tierra, formando aguas subterráneas. Luego, el ciclo vuelve a empezar.</p>
+                `,
+                // imageUrl: 'https://placehold.co/600x300/DDC1FF/000000?text=Ciclo+Agua', // Imagen eliminada
+                questions: [
+                    { id: 'q3_1', question: '1. ¿Cuál es la fuerza principal que inicia el proceso de evaporación del agua?', options: ['a) El viento.', 'b) El frío.', 'c) El calor del sol.', 'd) La gravedad.'], answer: 'c) El calor del sol.' },
+                    { id: 'q3_2', question: '2. ¿Qué etapa del ciclo del agua es responsable de la formación de las nubes?', options: ['a) Evaporación.', 'b) Precipitación.', 'c) Recolección.', 'd) Condensación.'], answer: 'd) Condensación.' },
+                    { id: 'q3_3', question: '3. ¿En qué formas puede caer el agua a la Tierra durante la precipitación?', options: ['a) Solo lluvia.', 'b) Lluvia, nieve o granizo.', 'c) Vapor y nubes.', 'd) Solo granizo.'], answer: 'b) Lluvia, nieve o granizo.' },
+                    { id: 'q3_4', question: '4. ¿Cuál es el propósito principal de un texto como "El Ciclo del Agua"?', options: ['a) Contar una historia divertida.', 'b) Dar una opinión sobre el agua.', 'c) Explicar un proceso natural.', 'd) Convencer de algo.'], answer: 'c) Explicar un proceso natural.' },
+                ]
+            },
+            {
+                id: 'mi-gato-saltador',
+                order: 4,
+                type: 'Poema',
+                title: 'Mi Gato Saltador',
+                text: `
+                    <p>Mi gato es un acróbata,</p>
+                    <p>salta y salta sin parar.</p>
+                    <p>Desde el sillón a la ventana,</p>
+                    <p>parece que va a volar.</p>
+                    <br>
+                    <p>Sus ojos verdes, brillantes,</p>
+                    <p>miran todo con atención.</p>
+                    <p>Es un cazador elegante,</p>
+                    <p>lleno de gracia y emoción.</p>
+                    <br>
+                    <p>Con su cola larga y suave,</p>
+                    <p>equilibrio sabe guardar.</p>
+                    <p>Mi gato es una nave,</p>
+                    <p>que no para de jugar.</p>
+                `,
+                // imageUrl: 'https://placehold.co/600x300/D1D1FF/000000?text=Gato+Saltador', // Imagen eliminada
+                questions: [
+                    { id: 'q4_1', question: '1. ¿Qué característica principal del gato se destaca en el poema?', options: ['a) Su color.', 'b) Su habilidad para saltar.', 'c) Su voz.', 'd) Su tamaño.'], answer: 'b) Su habilidad para saltar.' },
+                    { id: 'q4_2', question: '2. ¿Con qué compara el autor los ojos del gato?', options: ['a) Con estrellas.', 'b) Con esmeraldas.', 'c) Con canicas.', 'd) Con botones.'], answer: 'b) Con esmeraldas.' },
+                    { id: 'q4_3', question: '3. ¿Qué parte del cuerpo del gato le ayuda a mantener el equilibrio?', options: ['a) Sus patas.', 'b) Sus orejas.', 'c) Su cola.', 'd) Sus bigotes.'], answer: 'c) Su cola.' },
+                    { id: 'q4_4', question: '4. ¿Qué sentimiento principal transmite el poema hacia el gato?', options: ['a) Miedo.', 'b) Aburrimiento.', 'c) Admiración y cariño.', 'd) Sorpresa.'], answer: 'c) Admiración y cariño.' },
+                ]
+            },
+            {
+                id: 'noticia-mariposa',
+                order: 5,
+                type: 'Noticia',
+                title: 'Descubren Nueva Especie de Mariposa en el Bosque Nuboso',
+                text: `
+                    <p><strong>CIUDAD VERDE, 20 de mayo de 2025 –</strong> Un equipo de científicos de la Universidad Nacional ha anunciado hoy el descubrimiento de una nueva especie de mariposa en el remoto Bosque Nuboso de la Cordillera del Arcoíris. La mariposa, bautizada como "Alas de Cristal" por la transparencia de sus alas, fue encontrada durante una expedición de investigación de tres meses.</p>
+                    <p>La Dra. Elena Ríos, líder del equipo, explicó que esta mariposa se alimenta de un tipo específico de orquídea que solo crece en esa región. "Este hallazgo es crucial para entender la biodiversidad de nuestro planeta y la importancia de proteger estos ecosistemas únicos," afirmó la Dra. Ríos en una conferencia de prensa. Se espera que el descubrimiento impulse nuevas iniciativas de conservación en la zona.</p>
+                `,
+                // imageUrl: 'https://placehold.co/600x300/B0E0B0/000000?text=Mariposa+Nueva', // Imagen eliminada
+                questions: [
+                    { id: 'q5_1', question: '1. ¿Quiénes descubrieron la nueva especie de mariposa?', options: ['a) Un grupo de turistas.', 'b) Estudiantes de primaria.', 'c) Un equipo de científicos.', 'd) Unos exploradores de la selva.'], answer: 'c) Un equipo de científicos.' },
+                    { id: 'q5_2', question: '2. ¿Dónde fue encontrada la mariposa "Alas de Cristal"?', options: ['a) En un jardín botánico.', 'b) En el Bosque Nuboso de la Cordillera del Arcoíris.', 'c) En un zoológico.', 'd) En la ciudad.'], answer: 'b) En el Bosque Nuboso de la Cordillera del Arcoíris.' },
+                    { id: 'q5_3', question: '3. ¿Por qué el hallazgo de esta mariposa es importante, según la Dra. Elena Ríos?', options: ['a) Para venderla en el mercado.', 'b) Para entender la biodiversidad y proteger los ecosistemas.', 'c) Para decorar museos.', 'd) Para estudiar su vuelo.'], answer: 'b) Para entender la biodiversidad y proteger los ecosistemas.' },
+                    { id: 'q5_4', question: '4. ¿Cuál es el propósito principal de una noticia como esta?', options: ['a) Contar una historia de fantasía.', 'b) Dar una opinión personal.', 'c) Informar sobre un evento o descubrimiento reciente.', 'd) Enseñar a hacer algo.'], answer: 'c) Informar sobre un evento o descubrimiento reciente.' },
+                ]
+            },
+            {
+                id: 'instrucciones-juego',
+                order: 6,
+                type: 'Instrucciones de Juego',
+                title: 'Instrucciones: El Tesoro Escondido',
+                text: `
+                    <p><strong>Jugadores:</strong> 2 a 4</p>
+                    <p><strong>Materiales:</strong> Tablero de juego, 4 fichas de colores, 1 dado, 20 cartas de "Pista", 10 cartas de "Trampa".</p>
+                    <h3>Objetivo del Juego:</h3>
+                    <p>Ser el primer jugador en encontrar el Tesoro Escondido en el centro del tablero.</p>
+                    <h3>Cómo Jugar:</h3>
+                    <ol>
+                        <li>Cada jugador elige una ficha y la coloca en la casilla de "Inicio".</li>
+                        <li>El jugador más joven comienza. El turno pasa hacia la derecha.</li>
+                        <li>En tu turno, lanza el dado y avanza tu ficha el número de casillas indicado.</li>
+                        <li>Si caes en una casilla con una "Pista", toma una carta de "Pista" y sigue la instrucción.</li>
+                        <li>Si caes en una casilla con una "Trampa", toma una carta de "Trampa" y sigue la instrucción (¡cuidado, pueden hacerte retroceder!).</li>
+                        <li>El juego termina cuando un jugador llega exactamente a la casilla central del Tesoro.</li>
+                    </ol>
+                `,
+                // imageUrl: 'https://placehold.co/600x300/FFDDC1/000000?text=Juego+Mesa', // Imagen eliminada
+                questions: [
+                    { id: 'q6_1', question: '1. ¿Cuántos jugadores pueden participar como máximo en este juego?', options: ['a) 2.', 'b) 3.', 'c) 4.', 'd) 5.'], answer: 'c) 4.' },
+                    { id: 'q6_2', question: '2. ¿Qué debe hacer un jugador si cae en una casilla con una "Trampa"?', options: ['a) Avanzar dos casillas.', 'b) Robar una ficha a otro jugador.', 'c) Tomar una carta de "Trampa" y seguir su instrucción.', 'd) Perder el turno.'], answer: 'c) Tomar una carta de "Trampa" y seguir su instrucción.' },
+                    { id: 'q6_3', question: '3. ¿Cuál es el objetivo final de los jugadores en "El Tesoro Escondido"?', options: ['a) Recolectar todas las cartas.', 'b) Ser el primer jugador en llegar al Tesoro.', 'c) Eliminar a los otros jugadores.', 'd) Dar la vuelta completa al tablero.'], answer: 'b) Ser el primer jugador en llegar al Tesoro.' },
+                    { id: 'q6_4', question: '4. ¿Qué tipo de texto es este, según su función?', options: ['a) Un poema.', 'b) Una carta.', 'c) Un texto instructivo.', 'd) Una fábula.'], answer: 'c) Un texto instructivo.' },
+                ]
+            }
+        ];
+
+        // --- VARIABLES GLOBALES Y ELEMENTOS DEL DOM ---
+        let currentTextIndex = 0;
+        let userProgress = loadProgress(); // Carga el progreso guardado
+
+        const correctSound = new Audio('https://www.soundjay.com/buttons/sounds/button-10.mp3'); // Sonido de éxito
+        const incorrectSound = new Audio('https://www.soundjay.com/buttons/sounds/button-9.mp3'); // Sonido de error
+
+        const textSelectorContainer = document.getElementById('text-selector-container');
+        const lessonContentDiv = document.getElementById('lesson-content');
+        const storyTitleElem = document.getElementById('story-title');
+        // const storyImageElem = document.getElementById('story-image'); // Elemento de imagen eliminado
+        const storyTextElem = document.getElementById('story-text');
+        const questionsContainer = document.getElementById('questions-container');
+        const checkBtn = document.getElementById('check-answers-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const nextTextBtn = document.getElementById('next-text-btn');
+
+        // --- FUNCIONES DE PROGRESO (localStorage) ---
+        function loadProgress() {
+            try {
+                const progress = localStorage.getItem('readingComprehensionProgress4thGrade'); // ID único para 4to grado
+                return progress ? JSON.parse(progress) : {};
+            } catch (e) {
+                console.error("Error al cargar el progreso de localStorage:", e);
+                return {};
+            }
+        }
+
+        function saveProgress() {
+            try {
+                localStorage.setItem('readingComprehensionProgress4thGrade', JSON.stringify(userProgress)); // ID único
+            } catch (e) {
+                console.error("Error al guardar el progreso en localStorage:", e);
+            }
+        }
+
+        function markTextAsCompleted(textId) {
+            userProgress[textId] = true;
+            saveProgress();
+            renderTextSelector(); // Actualiza la visualización de los botones
+        }
+
+        function isTextCompleted(textId) {
+            return userProgress[textId] === true;
+        }
+
+        function isTextUnlocked(textOrder) {
+            if (textOrder === 1) {
+                return true; // El primer texto siempre está desbloqueado
+            }
+            const previousText = readingContent.find(t => t.order === textOrder - 1);
+            return previousText && isTextCompleted(previousText.id);
+        }
+
+        // --- FUNCIONES DE RENDERIZADO ---
+        function renderTextSelector() {
+            textSelectorContainer.innerHTML = ''; // Limpiar selectores anteriores
+            readingContent.sort((a, b) => a.order - b.order).forEach((textData, index) => {
+                const unlocked = isTextUnlocked(textData.order);
+                const completed = isTextCompleted(textData.id);
+                const button = document.createElement('button');
+                button.className = `
+                    py-3 px-4 rounded-lg shadow-md transform hover:scale-105 transition duration-300 ease-in-out text-base font-semibold flex items-center justify-center text-center
+                    ${unlocked ? (completed ? 'bg-green-300 hover:bg-green-400 text-green-900' : 'bg-teal-400 hover:bg-teal-500 text-white') : 'bg-gray-300 text-gray-600 cursor-not-allowed opacity-70'}
+                `;
+                button.disabled = !unlocked;
+                button.dataset.index = index;
+                button.innerHTML = `
+                    <span class="text-2xl mr-2">${unlocked ? (completed ? '✅' : '📖') : '🔒'}</span>
+                    <div>
+                        ${textData.title}
+                        <span class="block text-sm font-normal">${textData.type}</span>
+                        <span class="block text-xs font-normal mt-0.5">${unlocked ? (completed ? '(Completado)' : '(Bloqueado)') : '(Bloqueado)'}</span>
+                    </div>
+                `;
+                button.addEventListener('click', () => loadText(index));
+                textSelectorContainer.appendChild(button);
+            });
+        }
+
+        function loadText(index) {
+            currentTextIndex = index;
+            const textData = readingContent[currentTextIndex];
+
+            if (!textData) {
+                console.error("No se encontró el texto para el índice:", index);
+                return;
+            }
+
+            // Mostrar la sección de contenido
+            lessonContentDiv.classList.remove('hidden');
+            // Ocultar el selector de textos temporalmente si se desea
+            // textSelectorContainer.parentElement.classList.add('hidden');
+
+            storyTitleElem.textContent = textData.title;
+            // storyImageElem.src = textData.imageUrl; // Línea de imagen eliminada
+            storyTextElem.innerHTML = textData.text; // Usar innerHTML para el contenido HTML de los textos
+
+            renderQuestions(textData.questions);
+            resetQuizState(); // Limpiar respuestas y feedback
+            updateNavigationButtons();
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Volver al inicio de la página
+        }
+
+        function renderQuestions(questions) {
+            questionsContainer.innerHTML = ''; // Limpiar preguntas anteriores
+            questions.forEach((q, qIndex) => {
+                const questionBlock = document.createElement('div');
+                questionBlock.className = 'question-block p-4 bg-yellow-50 rounded-lg shadow-sm border border-yellow-200';
+                questionBlock.innerHTML = `
+                    <p class="text-xl font-semibold text-gray-800 mb-3">${q.question}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${q.options.map((option, optIndex) => `
+                            <label class="option-label flex items-center bg-yellow-200 p-3 rounded-lg hover:bg-yellow-300 transition duration-200 ease-in-out cursor-pointer">
+                                <input type="radio" name="q${q.id}" value="${option}" class="form-radio h-5 w-5 text-yellow-600">
+                                <span class="ml-2 text-gray-800 font-medium">${option}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <p class="feedback-message mt-3 font-medium"></p>
+                `;
+                questionsContainer.appendChild(questionBlock);
+            });
+        }
+
+        function resetQuizState() {
+            const questionBlocks = questionsContainer.querySelectorAll('.question-block');
+            questionBlocks.forEach(block => {
+                const options = block.querySelectorAll('input[type="radio"]');
+                const feedbackMessage = block.querySelector('.feedback-message');
+
+                options.forEach(option => {
+                    option.checked = false; // Desmarcar todas las opciones
+                    option.disabled = false; // Habilitar opciones
+                });
+                feedbackMessage.textContent = ''; // Limpiar mensajes de retroalimentación
+                feedbackMessage.className = 'feedback-message mt-3 font-medium'; // Resetear clases
+            });
+
+            checkBtn.disabled = false;
+            checkBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            nextTextBtn.classList.add('hidden'); // Ocultar botón de siguiente texto
+        }
+
+        function updateNavigationButtons() {
+            // No hay botones de navegación de texto previo/siguiente aquí, solo el de "Siguiente Aventura"
+            // que se muestra al completar el quiz.
+            // Siempre se puede volver al selector de textos.
+        }
+
+        // --- LÓGICA DE VERIFICACIÓN ---
+        function checkAnswers() {
+            let allCorrect = true;
+            const currentTextData = readingContent[currentTextIndex];
+            const questionBlocks = questionsContainer.querySelectorAll('.question-block');
+
+            questionBlocks.forEach((block, qIndex) => {
+                const questionName = block.querySelector('input[type="radio"]').name;
+                const selectedOption = block.querySelector(`input[name="${questionName}"]:checked`);
+                const feedbackMessage = block.querySelector('.feedback-message');
+                const options = block.querySelectorAll('input[type="radio"]');
+
+                options.forEach(option => option.disabled = true); // Deshabilitar opciones
+
+                if (selectedOption) {
+                    // Encontrar la pregunta en los datos de readingContent para obtener la respuesta correcta
+                    const questionData = currentTextData.questions[qIndex];
+                    if (selectedOption.value === questionData.answer) {
+                        feedbackMessage.textContent = '¡Correcto! ✅';
+                        feedbackMessage.className = 'feedback-message mt-3 font-medium text-green-600';
+                    } else {
+                        feedbackMessage.textContent = `Incorrecto. La respuesta correcta era: "${questionData.answer}" ❌`;
+                        feedbackMessage.className = 'feedback-message mt-3 font-medium text-red-600';
+                        allCorrect = false;
+                    }
+                } else {
+                    feedbackMessage.textContent = 'Por favor, selecciona una opción. ⚠️';
+                    feedbackMessage.className = 'feedback-message mt-3 font-medium text-orange-600';
+                    allCorrect = false;
+                }
+            });
+
+            if (allCorrect) {
+                correctSound.play();
+                // Marcar texto como completado y mostrar botón de siguiente
+                markTextAsCompleted(currentTextData.id);
+                if (currentTextIndex < readingContent.length - 1) {
+                    nextTextBtn.classList.remove('hidden');
+                }
+            } else {
+                incorrectSound.play();
+            }
+
+            checkBtn.disabled = true;
+            checkBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+
+        // --- INICIALIZACIÓN Y EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTextSelector(); // Renderiza los botones de selección de texto al cargar
+
+            // Cargar el último texto visitado si existe en localStorage
+            const lastVisitedTextId = localStorage.getItem('lastVisitedTextId4thGrade'); // ID único para 4to grado
+            if (lastVisitedTextId) {
+                const index = readingContent.findIndex(t => t.id === lastVisitedTextId);
+                if (index !== -1) {
+                    loadText(index);
+                } else {
+                    loadText(0); // Si no se encuentra, carga el primero
+                }
+            } else {
+                loadText(0); // Carga el primer texto por defecto
+            }
+
+            checkBtn.addEventListener('click', checkAnswers);
+            resetBtn.addEventListener('click', resetQuizState);
+            nextTextBtn.addEventListener('click', () => {
+                if (currentTextIndex < readingContent.length - 1) {
+                    loadText(currentTextIndex + 1);
+                } else {
+                    // Si ya es el último texto, quizás volver al selector
+                    lessonContentDiv.classList.add('hidden');
+                    renderTextSelector();
+                    alert("¡Has completado todas las aventuras de lectura! ¡Felicidades!");
+                }
+            });
+
+            // Guardar el texto actual en localStorage cada vez que se carga uno
+            window.addEventListener('beforeunload', () => {
+                localStorage.setItem('lastVisitedTextId4thGrade', readingContent[currentTextIndex].id); // ID único
+            });
+        });
+    </script>
+</body>
+</html>
